@@ -14,3 +14,20 @@ Some of the videos that inspired me are:
 ## How to Use
 
 TODO, I haven't coded a single thing yet
+
+
+
+# Citations
+
+This is where I got all of my data from and trained my AI using
+@InProceedings{MartinFTM01,
+  author = {D. Martin and C. Fowlkes and D. Tal and J. Malik},
+  title = {A Database of Human Segmented Natural Images and its
+           Application to Evaluating Segmentation Algorithms and
+           Measuring Ecological Statistics},
+  booktitle = {Proc. 8th Int'l Conf. Computer Vision},
+  year = {2001},
+  month = {July},
+  volume = {2},
+  pages = {416--423}
+}

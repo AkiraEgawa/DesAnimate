@@ -13,7 +13,7 @@ class EdgeDetectionDataset(Dataset):
         self.images = sorted(os.listdir(image_dir))
         self.masks = sorted(os.listdir(mask_dir))
 
-        assert len(self.images) = len(self.masks), "Mismatch between images and mask length"
+        assert len(self.images) == len(self.masks), "Mismatch between images and mask length"
 
         if is_train:
             self.transform = transforms.Compose([

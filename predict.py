@@ -36,56 +36,72 @@ def predict_single_image(image_path, output_path, weights_path="weights/graphcv_
         probabilities = torch.sigmoid(logits) # Convert raw numbers to 0.0 - 1.0 confidence values
         
     # 5. Post-process tensor back into a viewable image
-    # Remove batch dimension and scale back to 0-255 integers
     pred_mask = probabilities.squeeze(0).squeeze(0).cpu().numpy()
     print(f"→ Processing values -> Min: {pred_mask.min():.4f} | Max: {pred_mask.max():.4f}")
     
-    # 1. DEFENSE: Check if the model is heavily saturated (stuck near 1.0)
+    # Create a single unified variable to hold our binary edge mask
+    binary_mask = None
+
+    # Path A: Saturated handling (Percentile-based)
     if pred_mask.min() > 0.5:
         print("  ⚠ Saturated confidence detected. Isolating the top 2% sharpest contrast changes...")
         threshold_value = np.percentile(pred_mask, 98)
         binary_mask = (pred_mask >= threshold_value).astype('uint8') * 255
+    
+    # Path B: Normal / Bad Apple handling (Canny-based)
     else:
-        # Standard robust normalization for normal, well-behaved ranges
         if pred_mask.max() - pred_mask.min() > 1e-5:
             normalized = (pred_mask - pred_mask.min()) / (pred_mask.max() - pred_mask.min())
         else:
             normalized = pred_mask
-        binary_mask = (normalized > 0.35).astype('uint8') * 255
+        ai_grayscale = (normalized * 255).astype('uint8')
+        
+        # Use Canny directly to track crisp, sharp lines
+        binary_mask = cv2.Canny(ai_grayscale, threshold1=50, threshold2=150)
 
-    # 2. CLEANING: Use morphological closing to bridge minor gaps
+    # --- UNIFIED MORPHOLOGICAL CLEANING ---
     kernel = np.ones((7, 7), np.uint8)
     cleaned_mask = cv2.morphologyEx(binary_mask, cv2.MORPH_CLOSE, kernel)
     
-    # 3. SILHOUETTE ISOLATION: cv2.RETR_EXTERNAL ensures we only get the outermost boundaries
-    contours, _ = cv2.findContours(cleaned_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 3. HIERARCHY ISOLATION: RETR_CCOMP pulls both outer and inner boundaries and links them
+    contours, hierarchy = cv2.findContours(cleaned_mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
     
     final_edges = np.zeros_like(cleaned_mask)
     h, w = cleaned_mask.shape
 
-    for cnt in contours:
-        x, y, box_w, box_h = cv2.boundingRect(cnt)
-        if box_w >= w - 2 or box_h >= h - 2:
-            continue  
-            
-        area = cv2.contourArea(cnt)
-        min_area = 10 if pred_mask.min() > 0.5 else 30
-        if area < min_area: 
-            continue
-            
-        # --- NEW: CONTOUR SMOOTHING (ANTI-ALIASING) ---
-        # epsilon controls how aggressive the smoothing is. 
-        # 0.005 to 0.01 times the contour perimeter is usually the sweet spot!
-        perimeter = cv2.arcLength(cnt, True)
-        epsilon = 0.006 * perimeter
-        smoothed_cnt = cv2.approxPolyDP(cnt, epsilon, True)
+    # Safety check: make sure contours were actually found
+    if hierarchy is not None:
+        hierarchy = hierarchy[0] # Flatten the outer hierarchy array
         
-        # Draw the smooth, simplified contour path instead of the raw jagged one
-        cv2.drawContours(final_edges, [smoothed_cnt], -1, (255), thickness=1)
-        
+        for idx, cnt in enumerate(contours):
+            # --- NEW: CONCENTRIC LAYER FILTER ---
+            # hierarchy[idx][3] looks at the "Parent" index of the current contour.
+            # If it has a parent (value is NOT -1), it means this is a nested inner edge.
+            # Skip it to destroy the duplicate/inside lines!
+            if hierarchy[idx][3] != -1:
+                continue
+
+            # ARTIFACT GUARD: Skip full-frame border artifacts
+            x, y, box_w, box_h = cv2.boundingRect(cnt)
+            if box_w >= w - 2 or box_h >= h - 2:
+                continue  
+                
+            # NOISE FILTER: Discard tiny pixel specks
+            area = cv2.contourArea(cnt)
+            min_area = 10 if pred_mask.min() > 0.5 else 30
+            if area < min_area: 
+                continue
+                
+            # CONTOURS SMOOTHING (ANTI-ALIASING)
+            perimeter = cv2.arcLength(cnt, True)
+            epsilon = 0.006 * perimeter
+            smoothed_cnt = cv2.approxPolyDP(cnt, epsilon, True)
+            
+            # Draw ONLY the verified true parent outer boundary
+            cv2.drawContours(final_edges, [smoothed_cnt], -1, (255), thickness=1)
     pred_image = Image.fromarray(final_edges, mode="L")
     pred_image.save(output_path)
-    print(f"✓ Saturated defense + Exterior boundary isolation applied. Saved to: {output_path}")
+    print(f"✓ Post-processing complete. Saved to: {output_path}")
 
 if __name__ == "__main__":
     # Let's test it on a random image from your validation set!

@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-def cannyPredict():
-    img_bgr = cv2.imread("datasets/images/train/sddefault.jpg")
+def cannyPredict(img_bgr):
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
     canny = cv2.Canny(img_gray, threshold1=60, threshold2=120, apertureSize=3, L2gradient=True)
@@ -20,7 +19,7 @@ def cannyPredict():
         canny[bad_y, :]=0
         
     pred_image = Image.fromarray(canny, mode="L")
-    pred_image.save("test.png")
+    return pred_image
 
 if __name__ == "__main__":
     cannyPredict()

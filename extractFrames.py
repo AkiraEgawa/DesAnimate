@@ -1,4 +1,3 @@
-from src.canny import cannyPredict
 import cv2
 import os
 import sys

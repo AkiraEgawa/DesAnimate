@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bad Apple Desmos Player</title>
+    <script src="https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+    <style>
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        #calculator { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="calculator"></div>
+
+    <script>
+        var elt = document.getElementById('calculator');
+        var calculator = Desmos.GraphingCalculator(elt, { expressions: false, settingsMenu: false });
+
+        let latexFrames = [];
+        let maxLinesDrawn = 0; // Tracks the highest number of curves used in a single frame
+
+        function renderFrame(frameExpressions) {
+            // OPTIMIZATION: Overwrite existing layers directly instead of deleting them.
+            // This is significantly faster for the Desmos engine!
+            for (let i = 0; i < frameExpressions.length; i++) {
+                calculator.setExpression({
+                    id: 'curve-' + i,
+                    latex: frameExpressions[i],
+                    color: '#000000'
+                });
+            }
+
+            // Clean up any lingering lines if the previous frame had more curves than this one
+            if (frameExpressions.length < maxLinesDrawn) {
+                for (let i = frameExpressions.length; i < maxLinesDrawn; i++) {
+                    calculator.removeExpression({ id: 'curve-' + i });
+                }
+            }
+
+            // Update our high-water mark for track management
+            maxLinesDrawn = Math.max(maxLinesDrawn, frameExpressions.length);
+        }
+
+        function go() {
+            let frame = 0;
+            
+            setInterval(function() {
+                if (frame < latexFrames.length) {
+                    renderFrame(latexFrames[frame]);
+                    frame++;
+                }
+            }, 1000 / 15); // Playback set to your current 15 FPS configuration
+        }
+
+        // Load your data from a clean local text file instead of setting up a Python Flask server
+        function init() {
+            fetch('desmos_compressed_flipbook.txt')
+                .then(res => res.text())
+                .then(text => {
+                    const lines = text.split('\n').filter(l => l.trim() !== '');
+                    
+                    // Parse your list-packed frames out into memory arrays
+                    latexFrames = lines.map(line => {
+                        const rawMath = line.split('{f=')[0];
+                        // Format the list brackets cleanly into valid LaTeX parameters
+                        return [rawMath.replace(/\[/g, '\\left[').replace(/\]/g, '\\right]')];
+                    });
+
+                    console.log(`Loaded ${latexFrames.length} frames successfully.`);
+                    go();
+                });
+        }
+
+        // Kick off the player automatically on page load
+        window.onload = init;
+    </script>
+</body>
+</html>

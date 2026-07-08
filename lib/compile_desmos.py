@@ -1,10 +1,13 @@
 import os
 import glob
 import re
+import sys
 
 def compile():
-    input_dir = "bezier"
-    output_file = "desmos_compressed_flipbook.txt"
+    if len(sys.argv) != 2:
+        print(f"USAGE: python {sys.argv[0]} <bezier_folder>")
+    input_dir = sys.arg[1]
+    output_file = "desmos_animated.txt"
     
     # 1. Gather and sort your text files to preserve the timeline
     search_path = os.path.join(input_dir, "edge_frame_*.txt")

@@ -3,9 +3,12 @@ import os
 import glob
 from PIL import Image
 import cv2
+import sys
 
 def extractLines():
-    input_dir = "frames"
+    if len(sys.argv) != 2:
+        print(f"USAGE: python {sys.argv[0]} <frames>")
+    input_dir = sys.argv[1]
     output_dir = "processed_lines"
 
     os.makedirs(output_dir, exist_ok=True)

@@ -2,7 +2,7 @@ import os
 import glob
 import re
 
-def main():
+def compile():
     input_dir = "bezier"
     output_file = "desmos_compressed_flipbook.txt"
     
@@ -74,4 +74,4 @@ def main():
     print(f"💾 Open and copy the contents of: {output_file}")
 
 if __name__ == "__main__":
-    main()
+    compile()

@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import glob
+import sys
 
 def fit_bezier_handles(p0, p3, scale=0.333):
     """
@@ -39,7 +40,7 @@ def image_to_desmos_bezier(image_path):
         if perimeter < 10: # Skip noise
             continue
             
-        epsilon = 0.00 * perimeter
+        epsilon = 0.002 * perimeter
         anchors = cv2.approxPolyDP(cnt, epsilon, False).squeeze(1)
         
         # We need at least two points to draw a curve segment
@@ -70,24 +71,35 @@ def image_to_desmos_bezier(image_path):
     return desmos_equations
 
 if __name__ == "__main__":
-    # Test on your processed Canny line frame
-    TEST_FRAME = "processed_lines/edge_frame_00090.png"
-    TXT_OUTPUT = "desmos_equations.txt"
+    if len(sys.argv) != 2:
+        print(f"Usage: python {sys.argv[0]} <processed lines>")
+        sys.exit(1)
     
-    if os.path.exists(TEST_FRAME):
-        print(f"→ Calculating Bézier curves for: {TEST_FRAME}")
-        curves = image_to_desmos_bezier(TEST_FRAME)
-        
-        # 1. Print ABSOLUTELY EVERYTHING to the terminal window
-        print(f"\n✨ Generated {len(curves)} Bézier segments!\n")
-        for c in curves:
-            print(c)
+    input_dir = sys.argv[1]
+    output_dir = "bezier"
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    search_path = os.path.join(input_dir, "edge_frame_*.png")
+    frame_paths = sorted(glob.glob(search_path))
+
+    if not frame_paths:
+        print(f"No edge frames found in {input_dir} matching pattern edge_frame_*.png")
+        sys.exit(1)
+    
+    print(f"Images found, proceeding")
+
+    for path in frame_paths:
+        base_name = os.path.basename(path)
+        txt_filename = os.path.splitext(base_name)[0] + ".txt"
+        output_path = os.path.join(output_dir, txt_filename)
+
+        try:
+            curves = image_to_desmos_bezier(path)
+
+            with open(output_path, "w") as f:
+                for c in curves:
+                    f.write(c + "\n")
             
-        # 2. Save everything to a text file for ultimate ease of copy-pasting
-        with open(TXT_OUTPUT, "w") as f:
-            for c in curves:
-                f.write(c + "\n")
-                
-        print(f"\n💾 Saved all {len(curves)} equations perfectly to: {TXT_OUTPUT}")
-    else:
-        print(f"Could not find processed edge map at {TEST_FRAME}. Please check your folder paths!")
+        except Exception as e:
+            print(f"Error vectorizing {base_name}.png: {e}")

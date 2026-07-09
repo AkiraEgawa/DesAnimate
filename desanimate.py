@@ -11,7 +11,6 @@ def help():
     print("1 = frames, arguments = <frames_folder>")
     print("2 = lines, arguments = <lines_folder>")
     print("3 = beziers, arguments = <bezier_folder>")
-    print("4 = equations, arguments = <desmos_equations.text>")
     print(f"To clean the standard outputs: python {sys.argv[0]} clean")
 
 def clean():
@@ -52,7 +51,6 @@ def main():
     frames = "frames"
     processed_lines = "processed_lines"
     bezier = "bezier"
-    equations = "desmos_equations.txt"
     target_fps = 0
     video = ""
 
@@ -68,10 +66,8 @@ def main():
             processed_lines = sys.argv[2]
         case 3:
             bezier = sys.argv[2]
-        case 4:
-            equations = sys.argv[2]
     
-    inputs = [(video, target_fps), frames, processed_lines, bezier, equations]
+    inputs = [(video, target_fps), frames, processed_lines, bezier]
     
     for i, func in enumerate(pipeline[step:]):
         # runs everything sequentially

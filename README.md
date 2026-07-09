@@ -22,6 +22,12 @@ pip install opencv-python numpy pillow
 
 ## How to Use
 
+To use the code, clone the repo into your own device with this command
+```bash
+git clone git@github.com:AkiraEgawa/DesAnimate.git
+```
+
+# Main Function Call
 ```bash
 python main.py <step_number_or_command> <additional_arguments>
 ```

@@ -15,7 +15,10 @@ Some of the videos that inspired me are:
 
 This program runs on python 3, you can check via `python --version`, it should output a number starting with 3
 Additional libraries needed are opencv-python, numpy, and pillow
-Installation Process is: `pip install opencv-python numpy pillow`
+Installation Process is:
+```bash
+pip install opencv-python numpy pillow
+```
 
 ## How to Use
 

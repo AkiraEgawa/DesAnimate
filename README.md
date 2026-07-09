@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a program that when given a video, can turn it into a series of desmos functions to animate it using bezier curves
+The script executes a multi-step pipeline that extracts frames from a video, processes them into lines, converts those lines into Bezier curves, and compiles them into Desmos equations
 
 ### Inspiration
 
@@ -13,6 +13,32 @@ Some of the videos that inspired me are:
 
 ## Requirements
 
+This program runs on python 3, you can check via `python --version`, it should output a number starting with 3
+Additional libraries needed are opencv-python, numpy, and pillow
+Installation Process is: `pip install opencv-python numpy pillow`
+
 ## How to Use
 
-TODO, I haven't coded a single thing yet
+```bash
+python main.py <step_number_or_command> <additional_arguments>
+```
+
+| Step | Argument | Command Example | Description |
+| :--- | :--- | :--- | :--- |
+| **Step 0** | `<video_path> <fps>` | `python main.py 0 input.mp4 30` | Starts from the very beginning. Extracts frames from the video at the specified FPS and runs the entire pipeline. |
+| **Step 1** | `<frames_folder>` | `python main.py 1 ./frames` | Skips video extraction. Processes pre-extracted image frames into lines. |
+| **Step 2** | `<lines_folder>` | `python main.py 2 ./processed_lines` | Skips line extraction. Converts pre-processed line data into Bézier curves. |
+| **Step 3** | `<bezier_folder>` | `python main.py 3 ./bezier` | Skips curve generation. Compiles existing Bézier data into Desmos text files. |
+| **Step 4** | `<equations_file>` | `python main.py 4 desmos_equations.txt` | Runs final compilation step on the equations file. |
+
+# Utility Commands
+
+View Help Menu
+```Bash
+python desanimate.py help
+```
+
+Cleanup Generated outputs (deleltes all generated files and folders for a clean run)
+```Bash
+python desanimate.py clean
+```

@@ -3,10 +3,8 @@ import glob
 import re
 import sys
 
-def compile():
-    if len(sys.argv) != 2:
-        print(f"USAGE: python {sys.argv[0]} <bezier_folder>")
-    input_dir = sys.arg[1]
+def compile(bezier_folder):
+    input_dir = bezier_folder
     output_file = "desmos_animated.txt"
     
     # 1. Gather and sort your text files to preserve the timeline
@@ -77,4 +75,6 @@ def compile():
     print(f"💾 Open and copy the contents of: {output_file}")
 
 if __name__ == "__main__":
-    compile()
+    if len(sys.argv) != 2:
+        print(f"USAGE: python {sys.argv[1]} <bezier_folder>")
+    compile(sys.argv[1])

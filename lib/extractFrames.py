@@ -8,8 +8,10 @@ def checkInput():
         sys.exit()
 
 
-def extract_frames_helper(video_path, target_fps):
-    capture = cv2.VideoCapture(video_path)
+def extract_frames_helper(videoandfps):
+    video_path = videoandfps[0]
+    target_fps = videoandfps[1]
+    capture = cv2.VideoCapture(video_path, cv2.CAP_FFMPEG)
     if not capture.isOpened():
         print(f"Failed to open video: {video_path}")
         sys.exit(1)
@@ -35,9 +37,9 @@ def extract_frames_helper(video_path, target_fps):
             if frame.max() <= 5:
                 frame_index += 1
                 continue
-        else:
-            foundContent = True
-            print(f"Video Starts at frame {frame_index}")
+            else:
+                foundContent = True
+                print(f"Video Starts at frame {frame_index}")
 
         if frame_index % interval == 0:
             filename = os.path.join("frames", f"frame_{saved_index:05d}.png")
@@ -59,7 +61,7 @@ def extractFrames():
         print("frames must be an integer")
         sys.exit(1)
 
-    extract_frames_helper(video, frames)
+    extract_frames_helper((video, frames))
 
 if __name__ == "__main__":
     extractFrames()

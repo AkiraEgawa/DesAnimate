@@ -70,12 +70,8 @@ def image_to_desmos_bezier(image_path):
             
     return desmos_equations
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print(f"Usage: python {sys.argv[0]} <processed lines>")
-        sys.exit(1)
-    
-    input_dir = sys.argv[1]
+def lineToBezier(images):
+    input_dir = images
     output_dir = "bezier"
 
     os.makedirs(output_dir, exist_ok=True)
@@ -103,3 +99,11 @@ if __name__ == "__main__":
             
         except Exception as e:
             print(f"Error vectorizing {base_name}.png: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"Usage: python {sys.argv[0]} <processed lines>")
+        sys.exit(1)
+    
+    lineToBezier(sys.argv[1])
+

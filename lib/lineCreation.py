@@ -5,10 +5,7 @@ from PIL import Image
 import cv2
 import sys
 
-def extractLines():
-    if len(sys.argv) != 2:
-        print(f"USAGE: python {sys.argv[0]} <frames>")
-    input_dir = sys.argv[1]
+def extractLines(input_dir):
     output_dir = "processed_lines"
 
     os.makedirs(output_dir, exist_ok=True)
@@ -46,4 +43,8 @@ def extractLines():
 
 
 if __name__ == "__main__":
-    extractLines()
+    if len(sys.argv) != 2:
+        print(f"USAGE: python {sys.argv[0]} <frames>")
+        exit()
+    input_dir = sys.argv[1]
+    extractLines(input_dir)

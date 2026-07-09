@@ -54,7 +54,7 @@
 
         // Load your data from a clean local text file instead of setting up a Python Flask server
         function init() {
-            fetch('desmos_compressed_flipbook.txt')
+            fetch('desmos_animated.txt')
                 .then(res => res.text())
                 .then(text => {
                     const lines = text.split('\n').filter(l => l.trim() !== '');

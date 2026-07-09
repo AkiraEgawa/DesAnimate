@@ -20,14 +20,14 @@ Installation Process is:
 pip install opencv-python numpy pillow
 ```
 
-## How to Use
+# How to Use
 
 To use the code, clone the repo into your own device with this command
 ```bash
 git clone git@github.com:AkiraEgawa/DesAnimate.git
 ```
 
-# Main Function Call
+## Main Function Call
 ```bash
 python main.py <step_number_or_command> <additional_arguments>
 ```
@@ -41,7 +41,7 @@ python main.py <step_number_or_command> <additional_arguments>
 
 Note: The final `desmos_animated.txt` was too large to upload, so to see the bad apple animated, you will need to run the code given in step 3 first to generate it before following the instructions below.
 
-# Playing the Video
+## Playing the Video
 
 Due to the video being too intensive for the web version of Desmos, I opted to use the Desmos API version.
 ```bash
@@ -49,7 +49,7 @@ python -m http.server 8000
 ```
 Then just visit localhost:8000/
 
-# Utility Commands
+### Utility Commands
 
 View Help Menu
 ```Bash

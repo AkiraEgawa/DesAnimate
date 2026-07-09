@@ -8,7 +8,7 @@ def checkInput():
         sys.exit()
 
 
-def extract_frames_helper(videoandfps):
+def extract_frames_helper(videoandfps, progress=None, task_id=None):
     video_path = videoandfps[0]
     target_fps = videoandfps[1]
     capture = cv2.VideoCapture(video_path, cv2.CAP_FFMPEG)

@@ -59,8 +59,7 @@ def compile(bezier_folder):
             )
             
             master_lines.append(compressed_equation)
-            print(f"  ✓ Packed {len(x0_list)} curves into 1 Line for Frame {frame_idx} ← {base_name}")
-            
+
         except Exception as e:
             print(f"❌ Error compiling {base_name}: {e}")
             

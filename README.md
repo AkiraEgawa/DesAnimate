@@ -11,6 +11,8 @@ Some of the videos that inspired me are:
 [Bad Apple Desmos](https://www.youtube.com/watch?v=MVrNn5TuMkY)
 [Desmos Final Boss](https://www.youtube.com/watch?v=Q0mqWGRF6aQ)
 
+## Requirements
+
 ## How to Use
 
 TODO, I haven't coded a single thing yet

@@ -3,6 +3,7 @@ import sys
 import shutil
 from pathlib import Path
 
+
 def help():
     print(f"USAGE: python {sys.argv[0]} step#|help <additional arguments>")
     print("Step # denotes the starting point:")
